@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vault-secret-store
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0" # <-- ЗАПУСКАЕТСЯ ПОСЛЕ ESO
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/andreytiop/minikube-victorialogs-argocd.git'
+    targetRevision: HEAD
+    path: apps/vault-secret-store/manifests
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
