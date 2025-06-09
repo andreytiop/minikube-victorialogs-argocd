@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     # URL вашего репозитория
-    repoURL: 'git@github.com/andreytiop/minikube-victorialogs-argocd'
+    repoURL: 'git@github.com/andreytiop/minikube-victorialogs-argocd.git'
     targetRevision: HEAD
     path: apps # Директория, за которой следим
   destination:
