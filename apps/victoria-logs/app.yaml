@@ -4,7 +4,7 @@ metadata:
   name: victoria-logs
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "10" # <-- ПОСЛЕДНИЙ
+    argocd.argoproj.io/sync-wave: "0" # <-- ПОСЛЕДНИЙ
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
