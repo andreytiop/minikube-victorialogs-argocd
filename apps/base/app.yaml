@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: base-resources
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-10" # <-- САМЫЙ ПЕРВЫЙ
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/andreytiop/minikube-victorialogs-argocd.git' # <-- ЗАМЕНИТЕ
+    targetRevision: HEAD
+    path: apps/base/manifests # <-- Обратите внимание на новый путь
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

@@ -3,6 +3,8 @@ kind: Application
 metadata:
   name: victoria-logs
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "5" # <-- ПОСЛЕДНИЙ
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
@@ -10,22 +12,15 @@ spec:
   source:
     repoURL: 'https://victoriametrics.github.io/helm-charts/'
     chart: victoria-logs-single
-    targetRevision: 0.7.1 # Рекомендуется пиннить версию
+    targetRevision: 0.7.1
     helm:
       releaseName: victorialogs
       values: |
         server:
           persistentVolume:
-            enabled: false # Для minikube отключаем персистентность, чтобы не настраивать StorageClass
+            enabled: false
           service:
-            type: NodePort # Чтобы можно было легко получить доступ снаружи minikube
-        # Здесь вы могли бы использовать секрет, созданный ESO:
-        # env:
-        #   - name: MY_SECRET_VAR
-        #     valueFrom:
-        #       secretKeyRef:
-        #         name: victorialogs-dummy-secret-from-vault
-        #         key: my-secret-key
+            type: NodePort
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: victoria-logs
@@ -35,3 +30,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+

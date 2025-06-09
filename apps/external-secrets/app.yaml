@@ -3,6 +3,8 @@ kind: Application
 metadata:
   name: external-secrets
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-5" # <-- ВТОРОЙ
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
@@ -10,7 +12,7 @@ spec:
   source:
     repoURL: 'https://charts.external-secrets.io'
     chart: external-secrets
-    targetRevision: 0.9.11 # Рекомендуется пиннить версию
+    targetRevision: 0.9.11
     helm:
       releaseName: external-secrets
       values: |
@@ -24,4 +26,3 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-
