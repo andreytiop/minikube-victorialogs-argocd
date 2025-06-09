@@ -10,7 +10,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/andreytiop/minikube-victorialogs-argocd.git'
+    # --- ИСПРАВЛЕНИЕ ЗДЕСЬ ---
+    # Возвращаем URL официального репозитория Helm-чартов
+    repoURL: 'https://victoriametrics.github.io/helm-charts/'
     chart: victoria-logs-single
     targetRevision: 0.7.1
     helm:
