@@ -10,17 +10,12 @@ spec:
   source:
     repoURL: 'https://github.com/andreytiop/minikube-victorialogs-argocd.git'
     targetRevision: HEAD
-    path: apps # Директория, за которой следим
-    # --- ВОТ ИСПРАВЛЕНИЕ ---
-    # Добавляем эту секцию, чтобы ArgoCD искал файлы во вложенных папках
+    path: apps
     directory:
       recurse: true
-      
   destination:
     server: 'https://kubernetes.default.svc'
-    # Неймспейс назначения не важен для App-of-Apps, 
-    # так как дочерние приложения сами определяют свой namespace
-    namespace: default 
+    namespace: default
   syncPolicy:
     automated:
       prune: true

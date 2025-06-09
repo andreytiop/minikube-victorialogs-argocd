@@ -4,13 +4,13 @@ metadata:
   name: base-resources
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "-10" # <-- САМЫЙ ПЕРВЫЙ
+    argocd.argoproj.io/sync-wave: "-10"
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/andreytiop/minikube-victorialogs-argocd.git' # <-- ЗАМЕНИТЕ
+    repoURL: 'https://github.com/andreytiop/minikube-victorialogs-argocd.git'
     targetRevision: HEAD
-    path: apps/base/manifests # <-- Обратите внимание на новый путь
+    path: apps/base/manifests
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: default

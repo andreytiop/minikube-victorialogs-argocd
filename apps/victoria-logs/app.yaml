@@ -4,19 +4,19 @@ metadata:
   name: victoria-logs
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "0" # <-- ПОСЛЕДНИЙ
+    argocd.argoproj.io/sync-wave: "0"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
-    repoURL: 'https://victoriametrics.github.io/helm-charts/'
+    repoURL: 'https://github.com/andreytiop/minikube-victorialogs-argocd.git'
     chart: victoria-logs-single
     targetRevision: 0.7.1
     helm:
       releaseName: victorialogs
       values: |
-	fullnameOverride: "victoria-logs-single"
+        fullnameOverride: "victoria-logs-single"
         server:
           persistentVolume:
             enabled: false
@@ -31,4 +31,3 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-
