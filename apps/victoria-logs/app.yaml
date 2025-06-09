@@ -16,6 +16,7 @@ spec:
     helm:
       releaseName: victorialogs
       values: |
+	fullnameOverride: "victoria-logs-single"
         server:
           persistentVolume:
             enabled: false
