@@ -26,7 +26,7 @@ spec:
 
         # --- Автоматическая установка плагина VictoriaLogs ---
         installPlugins:
-          - "victoriametrics-logs-datasource"
+          - "victoriametrics-logs-datasource;2.3.0"
 
         # --- Автоматическое создание и настройка источника данных ---
         datasources:
