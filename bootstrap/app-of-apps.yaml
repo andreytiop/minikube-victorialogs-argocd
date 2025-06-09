@@ -11,9 +11,6 @@ spec:
     repoURL: 'https://github.com/andreytiop/minikube-victorialogs-argocd.git'
     targetRevision: HEAD
     path: apps
-    directory:
-      recurse: true
-      exclude: '*/manifests/*'
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: default
