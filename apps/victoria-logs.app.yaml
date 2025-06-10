@@ -19,13 +19,23 @@ spec:
         persistence:
           enabled: false
 
-        # --- НОВЫЙ, БОЛЕЕ НАДЕЖНЫЙ МЕТОД УСТАНОВКИ ПЛАГИНА ---
-        # Мы убрали 'installPlugins' и вместо этого используем init-контейнер
+        # --- Шаг 1: Определяем дополнительный том ---
+        # Мы создаем пустой том с именем 'plugins', который будет общим
+        # для init-контейнера и основного контейнера Grafana.
+        extraVolumes:
+          - name: plugins
+            emptyDir: {}
 
+        # --- Шаг 2: Монтируем этот том в основной контейнер Grafana ---
+        # Чтобы он мог видеть плагины, установленные init-контейнером.
+        extraVolumeMounts:
+          - name: plugins
+            mountPath: /var/lib/grafana/plugins
+
+        # --- Шаг 3: Наш init-контейнер, который также использует этот том ---
         extraInitContainers:
           - name: install-victoriametrics-plugin
-            # Используем тот же образ, что и сама Grafana, в нем есть утилита grafana-cli
-            image: grafana/grafana:11.0.0 # Рекомендуется использовать конкретную версию
+            image: grafana/grafana:11.0.0
             command:
               - "grafana-cli"
               - "--pluginsDir"
@@ -34,12 +44,10 @@ spec:
               - "install"
               - "victoriametrics-logs-datasource"
             volumeMounts:
-              # Монтируем общую папку для плагинов
               - name: plugins
                 mountPath: /var/lib/grafana/plugins
-
-        # --- Автоматическое создание и настройка источника данных ---
-        # Эта часть остается без изменений
+        
+        # --- Источник данных остается без изменений ---
         datasources:
           datasources.yaml:
             apiVersion: 1
