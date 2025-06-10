@@ -4,38 +4,56 @@ metadata:
   name: grafana
   namespace: argocd
   annotations:
-    # Устанавливаем волну 5, чтобы Grafana ставилась после VictoriaLogs (волна 0)
     argocd.argoproj.io/sync-wave: "5"
 spec:
   project: default
   source:
     repoURL: 'https://grafana.github.io/helm-charts'
     chart: grafana
-    # Пинним версию чарта для стабильности
     targetRevision: 7.3.11
     helm:
       releaseName: grafana
       values: |
-        # --- Общие настройки Grafana ---
-        # ВНИМАНИЕ: Пароль для демонстрации. В реальном проекте используйте секреты!
         adminPassword: 'admin123'
         
-        # Для Minikube отключаем персистентность
         persistence:
           enabled: false
 
-        # --- Автоматическая установка плагина VictoriaLogs ---
-        installPlugins:
-          - "victoriametrics-logs-datasource;2.3.0"
+        # --- Шаг 1: Определяем дополнительный том ---
+        # Мы создаем пустой том с именем 'plugins', который будет общим
+        # для init-контейнера и основного контейнера Grafana.
+        extraVolumes:
+          - name: plugins
+            emptyDir: {}
 
-        # --- Автоматическое создание и настройка источника данных ---
+        # --- Шаг 2: Монтируем этот том в основной контейнер Grafana ---
+        # Чтобы он мог видеть плагины, установленные init-контейнером.
+        extraVolumeMounts:
+          - name: plugins
+            mountPath: /var/lib/grafana/plugins
+
+        # --- Шаг 3: Наш init-контейнер, который также использует этот том ---
+        extraInitContainers:
+          - name: install-victoriametrics-plugin
+            image: grafana/grafana:11.0.0
+            command:
+              - "grafana-cli"
+              - "--pluginsDir"
+              - "/var/lib/grafana/plugins"
+              - "plugins"
+              - "install"
+              - "victoriametrics-logs-datasource"
+            volumeMounts:
+              - name: plugins
+                mountPath: /var/lib/grafana/plugins
+        
+        # --- Источник данных остается без изменений ---
         datasources:
           datasources.yaml:
             apiVersion: 1
             datasources:
               - name: VictoriaLogs
                 type: victoriametrics-logs-datasource
-                # URL для доступа к VictoriaLogs внутри кластера
                 url: http://victoria-logs-single.victoria-logs.svc.cluster.local:9428
                 access: proxy
                 isDefault: true

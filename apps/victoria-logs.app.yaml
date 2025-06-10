@@ -1,65 +1,32 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: grafana
+  name: victoria-logs
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "5"
+    argocd.argoproj.io/sync-wave: "0"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
-    repoURL: 'https://grafana.github.io/helm-charts'
-    chart: grafana
-    targetRevision: 7.3.11
+    # --- ИСПРАВЛЕНИЕ ЗДЕСЬ ---
+    # Возвращаем URL официального репозитория Helm-чартов
+    repoURL: 'https://victoriametrics.github.io/helm-charts/'
+    chart: victoria-logs-single
+    targetRevision: 0.7.1
     helm:
-      releaseName: grafana
+      releaseName: victorialogs
       values: |
-        adminPassword: 'admin123'
-        
-        persistence:
-          enabled: false
-
-        # --- Шаг 1: Определяем дополнительный том ---
-        # Мы создаем пустой том с именем 'plugins', который будет общим
-        # для init-контейнера и основного контейнера Grafana.
-        extraVolumes:
-          - name: plugins
-            emptyDir: {}
-
-        # --- Шаг 2: Монтируем этот том в основной контейнер Grafana ---
-        # Чтобы он мог видеть плагины, установленные init-контейнером.
-        extraVolumeMounts:
-          - name: plugins
-            mountPath: /var/lib/grafana/plugins
-
-        # --- Шаг 3: Наш init-контейнер, который также использует этот том ---
-        extraInitContainers:
-          - name: install-victoriametrics-plugin
-            image: grafana/grafana:11.0.0
-            command:
-              - "grafana-cli"
-              - "--pluginsDir"
-              - "/var/lib/grafana/plugins"
-              - "plugins"
-              - "install"
-              - "victoriametrics-logs-datasource"
-            volumeMounts:
-              - name: plugins
-                mountPath: /var/lib/grafana/plugins
-        
-        # --- Источник данных остается без изменений ---
-        datasources:
-          datasources.yaml:
-            apiVersion: 1
-            datasources:
-              - name: VictoriaLogs
-                type: victoriametrics-logs-datasource
-                url: http://victoria-logs-single.victoria-logs.svc.cluster.local:9428
-                access: proxy
-                isDefault: true
+        fullnameOverride: "victoria-logs-single"
+        server:
+          persistentVolume:
+            enabled: false
+          service:
+            type: ClusterIP
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: grafana
+    namespace: victoria-logs
   syncPolicy:
     automated:
       prune: true
